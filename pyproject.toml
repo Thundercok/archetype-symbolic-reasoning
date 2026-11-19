@@ -15,6 +15,9 @@ dependencies = []
 [project.scripts]
 archetype-mcp = "archetype_symbolic.mcp_server:main"
 
+[project.entry-points."rat.plugins"]
+divination = "archetype_symbolic.rat_plugin:DivinationToolPack"
+
 [dependency-groups]
 dev = [
     "pytest>=8.3.0",
