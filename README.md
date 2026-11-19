@@ -1,12 +1,12 @@
 # `archetype-symbolic-reasoning`: Neuro-Symbolic Grounding over Formal Archetypal Systems
 
-Research repository investigating **neuro-symbolic state tracking, constraint satisfaction, and canonical grounding** for Large Language Models (LLMs) operating over non-Western and classical formal symbolic systems.
+An independent Python toolkit and research repository for **deterministic symbolic computation, constraint verification, and canonical grounding** over selected classical symbolic systems. It can be used directly as a Python package or exposed to external agents through its MCP server.
 
-Rather than treating metaphysical frameworks (*I Ching / Kinh Dịch*, *Zi Wei Dou Shu / Tử Vi*, *Tarot*, *Numerology*) as free-form generative prose, this project models them as **deterministic discrete state spaces** paired with **structured constraint graphs** and **canonical textual corpora**. This yields a rigorous, low-contamination benchmark for testing whether LLMs perform genuine symbolic state manipulation or rely on memorized surface patterns.
+Rather than treating symbolic frameworks as free-form generative prose, the implemented engines represent selected systems—currently I Ching, Tarot, and Lenormand—with explicit deterministic operations and structured outputs. The broader research plan includes additional systems such as Zi Wei Dou Shu and Numerology; those planned phases should not be mistaken for completed implementations. The package provides a deterministic layer that an LLM or other client can call and verify.
 
 ---
 
-## 1. Problem Formulation
+## 1. Implemented Scope & Problem Formulation
 
 Let a formal symbolic system be defined as a tuple $\mathcal{S} = (\mathcal{X}, \mathcal{T}, \mathcal{C}, \mathcal{K})$ where:
 
@@ -23,7 +23,7 @@ Given an input specification $q$, a model must produce both a symbolic derivatio
 
 ---
 
-## 2. Research Roadmap
+## 2. Research Roadmap & Implementation Status
 
 | Phase | Symbolic System | Formal Structure | Primary Research Focus | Status |
 |:---|:---|:---|:---|:---|
@@ -54,20 +54,73 @@ archetype-symbolic-reasoning/
 
 ---
 
-## 4. Quickstart
+## 4. Installation & Standalone Use
 
 ```bash
-# Install dependencies via uv
+# Clone and enter the repository
+git clone https://github.com/Thundercok/archetype-symbolic-reasoning.git
+cd archetype-symbolic-reasoning
+
+# Install the project and development tools
 uv sync
 
-# Run unit tests & invariant checks
+# Run tests and lint checks
 uv run pytest
-
-# Lint codebase
 uv run ruff check src tests
+```
 
-# Start the MCP stdio server (JSON-RPC 2.0 for RAT, Claude Code, Cursor, etc.)
+The core package has no runtime dependencies declared in `pyproject.toml`. The `uv` development environment installs the test and lint tools.
+
+### Use as a Python package
+
+After `uv sync`, import the deterministic functions directly:
+
+```python
+from archetype_symbolic.core import analyze_hexagram, draw_tarot
+
+# Six binary lines, ordered bottom-to-top.
+state = analyze_hexagram(lines=[1, 0, 1, 0, 1, 0], changing_lines=[])
+print(state)
+
+# Seeded draw for reproducible experiments.
+cards = draw_tarot(count=3, allow_reversed=True, seed=42)
+print(cards)
+```
+
+The core functions can be called without starting an LLM, desktop app, RAT, or network service.
+
+---
+
+## 5. MCP Integration
+
+The repository includes a zero-dependency stdio MCP server. Start it from the cloned repository:
+
+```bash
 uv run archetype-mcp
 ```
+
+Example client configuration (adjust the absolute path to your local clone):
+
+```json
+{
+  "mcpServers": {
+    "archetype-symbolic-reasoning": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "/absolute/path/to/archetype-symbolic-reasoning",
+        "archetype-mcp"
+      ]
+    }
+  }
+}
+```
+
+The server exposes tools for parsing and verifying Tarot spreads, drawing Tarot and Lenormand cards, casting I Ching, and analyzing/verifying I Ching states. It uses stdio; do not print logs or other text to stdout in an MCP client process.
+
+### Optional RAT integration
+
+The package declares a `rat.plugins` entry point for its Divination ToolPack. This is an optional adapter: the symbolic core remains usable without RAT, and RAT is not a dependency of the core package. To enable the adapter, install this project into the same Python environment as a compatible RAT installation and enable the plugin in RAT. The plugin manifest currently defaults to disabled. The MCP server remains the more general integration route for other MCP-compatible clients.
 
 For full experimental methodology and contribution standards, see [docs/RESEARCH_PLAN.md](docs/RESEARCH_PLAN.md) and [docs/GUIDE.md](docs/GUIDE.md).
