@@ -82,7 +82,7 @@ def _make_pack_class() -> type:
         from rat.plugins.manifest import ToolPack, ToolPackManifest
 
         base: type = ToolPack
-        manifest = ToolPackManifest(
+        pack_manifest: Any = ToolPackManifest(
             id="divination",
             name="Bàn xem Tarot & Chiêm đoán (Archetype)",
             description=(
@@ -97,71 +97,63 @@ def _make_pack_class() -> type:
         )
     except ImportError:
         base = object
-        manifest = None
+        pack_manifest = None
 
     class _DivinationToolPack(base):  # type: ignore[valid-type, misc]
         """External RAT plugin pack supplied by archetype-symbolic-reasoning."""
 
-        pass
+        manifest = pack_manifest
 
-    _DivinationToolPack.manifest = manifest
+        def create_capabilities(self, context: dict[str, Any] | None = None) -> list[Any]:
+            from archetype_symbolic.rat_plugin.capability import create_reading_capability
 
-    def create_capabilities(self: Any, context: dict[str, Any] | None = None) -> list[Any]:
-        from archetype_symbolic.rat_plugin.capability import create_reading_capability
+            return [create_reading_capability()]
 
-        return [create_reading_capability()]
+        def get_ui_cards(self) -> list[dict[str, Any]]:
+            return [
+                {
+                    "id": "reading_desk",
+                    "name": "🔮 Gói mở rộng: Bàn xem Tarot...",
+                    "kind": "view",
+                    "qml": str(_QML_DIR / "ReadingDesk.qml"),
+                    "shortcut": "Ctrl+Shift+R",
+                },
+                {
+                    "id": "archetype_artifact_card",
+                    "name": "Archetype Artifact Card",
+                    "kind": "artifact_card",
+                    "qml": str(_QML_DIR / "ArchetypeArtifactCard.qml"),
+                    "visual_types": ["iching", "lenormand"],
+                },
+            ]
 
-    def get_ui_cards(self: Any) -> list[dict[str, Any]]:
-        return [
-            {
-                "id": "reading_desk",
-                "name": "🔮 Gói mở rộng: Bàn xem Tarot...",
-                "kind": "view",
-                "qml": str(_QML_DIR / "ReadingDesk.qml"),
-                "shortcut": "Ctrl+Shift+R",
-            },
-            {
-                "id": "archetype_artifact_card",
-                "name": "Archetype Artifact Card",
-                "kind": "artifact_card",
-                "qml": str(_QML_DIR / "ArchetypeArtifactCard.qml"),
-                "visual_types": ["iching", "lenormand"],
-            },
-        ]
+        def get_routing_keywords(self) -> tuple[str, ...]:
+            return (
+                "tarot",
+                "lenormand",
+                "rút bài",
+                "rut bai",
+                "rút 3 lá",
+                "rut 3 la",
+                "trải bài",
+                "kinh dịch",
+                "kinh dich",
+                "gieo quẻ",
+                "gieo que",
+                "lá bài",
+            )
 
-    def get_routing_keywords(self: Any) -> tuple[str, ...]:
-        return (
-            "tarot",
-            "lenormand",
-            "rút bài",
-            "rut bai",
-            "rút 3 lá",
-            "rut 3 la",
-            "trải bài",
-            "kinh dịch",
-            "kinh dich",
-            "gieo quẻ",
-            "gieo que",
-            "lá bài",
-        )
+        def get_slash_commands(self) -> dict[str, str]:
+            return {"/reading": "reading_desk"}
 
-    def get_slash_commands(self: Any) -> dict[str, str]:
-        return {"/reading": "reading_desk"}
+        def get_instant_handlers(self) -> list[Any]:
+            return [_handle_instant_query]
 
-    def get_instant_handlers(self: Any) -> list[Any]:
-        return [_handle_instant_query]
+        def create_ui_coordinator(self, controller: Any) -> Any:
+            from archetype_symbolic.rat_plugin.coordinator import ReadingDeskCoordinator
 
-    def create_ui_coordinator(self: Any, controller: Any) -> Any:
-        from archetype_symbolic.rat_plugin.coordinator import ReadingDeskCoordinator
+            return ReadingDeskCoordinator(controller)
 
-        return ReadingDeskCoordinator(controller)
-
-    _DivinationToolPack.create_capabilities = create_capabilities
-    _DivinationToolPack.get_ui_cards = get_ui_cards
-    _DivinationToolPack.get_routing_keywords = get_routing_keywords
-    _DivinationToolPack.get_slash_commands = get_slash_commands
-    _DivinationToolPack.get_instant_handlers = get_instant_handlers
-    _DivinationToolPack.create_ui_coordinator = create_ui_coordinator
     _DivinationToolPack.__name__ = "DivinationToolPack"
     _DivinationToolPack.__qualname__ = "DivinationToolPack"
     return _DivinationToolPack
