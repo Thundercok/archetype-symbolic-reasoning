@@ -42,11 +42,12 @@ archetype-symbolic-reasoning/
 │   └── GUIDE.md            # Development, corpus curation, and benchmarking guide
 ├── src/
 │   └── archetype_symbolic/
-│       ├── core/           # Pure deterministic symbolic engines (zero LLM calls)
-│       └── eval/           # Automated verifiers, metrics (State Acc, CVR, CCP), runners
+│       ├── core/           # Pure deterministic engines (iching, tarot, lenormand)
+│       ├── eval/           # Automated verifiers & metrics (State Acc, CVR, CCP)
+│       └── mcp_server.py   # Zero-dependency MCP stdio JSON-RPC 2.0 server
 ├── corpus/                 # Versioned, provenance-tracked canonical texts & mappings
 ├── experiments/            # Reproducible experiment configs, seeds, and logged outputs
-├── tests/                  # Unit & property-based tests for symbolic invariants
+├── tests/                  # Unit & algebraic invariant tests (core + MCP server)
 ├── pyproject.toml          # uv-managed Python 3.12+ environment
 └── LICENSE                 # MIT License
 ```
@@ -64,6 +65,9 @@ uv run pytest
 
 # Lint codebase
 uv run ruff check src tests
+
+# Start the MCP stdio server (JSON-RPC 2.0 for RAT, Claude Code, Cursor, etc.)
+uv run archetype-mcp
 ```
 
 For full experimental methodology and contribution standards, see [docs/RESEARCH_PLAN.md](docs/RESEARCH_PLAN.md) and [docs/GUIDE.md](docs/GUIDE.md).

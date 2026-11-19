@@ -12,6 +12,9 @@ license-files = ["LICENSE"]
 requires-python = ">=3.12"
 dependencies = []
 
+[project.scripts]
+archetype-mcp = "archetype_symbolic.mcp_server:main"
+
 [dependency-groups]
 dev = [
     "pytest>=8.3.0",
