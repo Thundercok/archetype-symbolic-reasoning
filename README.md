@@ -6,6 +6,16 @@ Rather than treating symbolic frameworks as free-form generative prose, the impl
 
 ---
 
+## Contents
+
+- [Implemented Scope & Problem Formulation](#1-implemented-scope--problem-formulation)
+- [Research Roadmap & Implementation Status](#2-research-roadmap--implementation-status)
+- [Repository Structure](#3-repository-structure)
+- [Installation & Standalone Use](#4-installation--standalone-use)
+- [MCP Integration](#5-mcp-integration)
+
+---
+
 ## 1. Implemented Scope & Problem Formulation
 
 Let a formal symbolic system be defined as a tuple $\mathcal{S} = (\mathcal{X}, \mathcal{T}, \mathcal{C}, \mathcal{K})$ where:
